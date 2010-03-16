@@ -2,8 +2,10 @@
 Handle expenditures
 """
 
+from __future__ import division
 import logging
 
+import re
 from decimal import Decimal, InvalidOperation
 
 from bluechips.lib.base import *
@@ -13,6 +15,7 @@ from pylons.decorators import validate
 from pylons.decorators.secure import authenticate_form
 from pylons.controllers.util import abort
 
+import formencode
 from formencode import validators, Schema
 from formencode.foreach import ForEach
 from formencode.variabledecode import NestedVariables
@@ -22,12 +25,29 @@ from mailer import Message
 
 log = logging.getLogger(__name__)
 
+class ExpenditureExpression(validators.FancyValidator):
+    goodChars = set('1234567890.+-/*() ')
+
+    def _to_python(self, value, state):
+        if (not set(value) <= self.goodChars or
+            re.search(r'([\+\-\*\/])\1', value)):
+            raise formencode.Invalid("Expression contains illegal characters", value, state)
+
+        if value == '':
+            return value, Decimal("0")
+
+        try:
+            number = eval(value)
+            return value, Decimal(str(number))
+        except:
+            raise formencode.Invalid("Not a valid mathematical expression", value, state)
+
 
 class ShareSchema(Schema):
     "Validate individual user shares."
     allow_extra_fields = False
     user_id = validators.Int(not_empty=True)
-    amount = validators.Number(not_empty=True)
+    amount = ExpenditureExpression()
 
 
 def validate_state(value_dict, state, validator):
@@ -77,16 +97,10 @@ class SpendController(BaseController):
             c.values = {}
             for ii, user_row in enumerate(c.users):
                 user_id, user = user_row
-                shares_by_user = dict(((sp.user, sp.share) for sp
+                shares_by_user = dict(((sp.user, sp.share_text) for sp
                                        in c.expenditure.splits))
-                share = shares_by_user.get(user, 0)
-                if c.expenditure.amount == 0:
-                    percent = 0
-                else:
-                    percent = (Decimal(100) * Decimal(int(share)) /
-                               Decimal(int(c.expenditure.amount))).\
-                            quantize(Decimal("0.001"))
-                c.values['shares-%d.amount' % ii] = percent
+                share = shares_by_user.get(user, '')
+                c.values['shares-%d.amount' % ii] = share
 
         return render('/spend/index.mako')
 
@@ -112,10 +126,13 @@ class SpendController(BaseController):
 
         users = dict(meta.Session.query(model.User.id, model.User).all())
         split_dict = {}
+        split_text_dict = {}
         for share_params in shares:
             user = users[share_params['user_id']]
-            split_dict[user] = Decimal(str(share_params['amount']))
-        e.split(split_dict)
+            amount_text, amount  = share_params['amount'] or ('',Decimal('0'))
+            split_dict[user] = amount
+            split_text_dict[user] = amount_text
+        e.split(split_dict, split_text_dict)
         
         meta.Session.commit()
        

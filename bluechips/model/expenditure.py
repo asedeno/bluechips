@@ -28,7 +28,7 @@ class Expenditure(object):
         split_percentage = Decimal(100) / Decimal(residents.count())
         self.split(dict((resident, split_percentage) for resident in residents))
     
-    def split(self, split_dict):
+    def split(self, split_dict, split_text_dict):
         """
         Split up an expenditure.
         
@@ -71,7 +71,7 @@ class Expenditure(object):
                 amounts_dict[winner] -= Currency(1)
         
         for user, share in amounts_dict.iteritems():
-            s = Split(self, user, share)
+            s = Split(self, user, share, split_text_dict[user])
             meta.Session.add(s)
 
     def involves(self, user):
