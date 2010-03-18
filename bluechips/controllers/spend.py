@@ -112,7 +112,7 @@ class SpendController(BaseController):
                 share = shares_by_user.get(user, '')
                 c.values['shares-%d.amount' % ii] = share
 
-            c.values['tags'] = ', '.join([tag.tag for tag in c.expenditure.tags])
+            c.values['tags'] = ', '.join(c.expenditure.tags)
 
         return render('/spend/index.mako')
 
@@ -146,7 +146,8 @@ class SpendController(BaseController):
             split_dict[user] = amount
             split_text_dict[user] = amount_text
         e.split(split_dict, split_text_dict)
-        e.tag(tags)
+        e.tags.clear()
+        e.tags |= tags
 
         meta.Session.commit()
        

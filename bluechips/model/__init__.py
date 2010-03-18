@@ -56,10 +56,15 @@ splits = sa.Table('splits', meta.metadata,
 
 tags = sa.Table('tags', meta.metadata,
                 sa.Column('id', sa.types.Integer, primary_key=True),
-                sa.Column('expenditure_id', sa.types.Integer,
-                          sa.ForeignKey('expenditures.id'), nullable=False),
-                sa.Column('tag', sa.Text, nullable=False))
+                sa.Column('name', sa.Text))
 
+tag_to_expense_map = sa.Table('tag_to_expense_map', meta.metadata,
+                              sa.Column('tag_id', sa.types.Integer,
+                                        sa.ForeignKey('tags.id'),
+                                        primary_key=True),
+                              sa.Column('expenditure_id', sa.types.Integer,
+                                        sa.ForeignKey('expenditures.id'),
+                                        primary_key=True))
 
 subitems = sa.Table('subitems', meta.metadata,
                     sa.Column('id', sa.types.Integer, primary_key=True),
@@ -96,8 +101,8 @@ orm.mapper(Expenditure, expenditures,
            properties={
         'splits': orm.relation(Split, backref='expenditure',
                                cascade='all, delete'),
-        'tags': orm.relation(Tag, backref='expenditure',
-                             cascade='all, delete'),
+        '_tags': orm.relation(Tag, secondary=tag_to_expense_map,
+                             collection_class=set, cascade='all, delete'),
         'subitems': orm.relation(Subitem, backref='expenditure',
                                  cascade='all, delete')
 })

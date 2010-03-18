@@ -1,8 +1,10 @@
+from sqlalchemy.ext.associationproxy import association_proxy
+
 from bluechips.model.user import User
 from bluechips.model.split import Split
 from bluechips.model import meta
 from bluechips.model.types import Currency
-from bluechips.model.tag import Tag
+from bluechips.model.tag import create_tag
 from decimal import Decimal
 from datetime import datetime
 import random
@@ -16,6 +18,8 @@ class Expenditure(object):
         if self.date == None:
             self.date = datetime.now()
     
+    tags = association_proxy('_tags', 'name', creator=create_tag)
+
     def __repr__(self):
         return '<Expenditure: spender: %s spent: %s>' % (self.spender,
                                                          self.amount)
@@ -74,14 +78,6 @@ class Expenditure(object):
         for user, share in amounts_dict.iteritems():
             s = Split(self, user, share, split_text_dict[user])
             meta.Session.add(s)
-
-    def tag(self, tags):
-        map(meta.Session.delete,
-            meta.Session.query(Tag).filter_by(expenditure_id=self.id))
-
-        for tag in tags:
-            t = Tag(self, tag)
-            meta.Session.add(t)
 
     def involves(self, user):
         "Returns True if ``user`` is involved in this expenditure."
