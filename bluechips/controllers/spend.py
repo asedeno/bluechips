@@ -6,6 +6,7 @@ from __future__ import division
 import logging
 
 import re
+import string
 from decimal import Decimal, InvalidOperation
 
 from bluechips.lib.base import *
@@ -42,6 +43,12 @@ class ExpenditureExpression(validators.FancyValidator):
         except:
             raise formencode.Invalid("Not a valid mathematical expression", value, state)
 
+class TagValidator(validators.FancyValidator):
+    def _to_python(self, value,state):
+        try:
+            return set(map(string.strip, value.split(',')))
+        except:
+            raise formencode.Invalid("Unable to parse tags", value, state)
 
 class ShareSchema(Schema):
     "Validate individual user shares."
@@ -63,6 +70,7 @@ class ExpenditureSchema(Schema):
     spender_id = validators.Int(not_empty=True)
     amount = model.types.CurrencyValidator(not_empty=True)
     description = validators.UnicodeString(not_empty=True)
+    tags = TagValidator()
     date = validators.DateConverter()
     shares = ForEach(ShareSchema)
     chained_validators = [ValidateNotAllZero]
@@ -89,6 +97,8 @@ class SpendController(BaseController):
                 if user.resident:
                     val = Decimal(1)
                 c.values['shares-%d.amount' % ii] = val
+
+            c.values['tags'] = u""
         else:
             c.title = 'Edit an Expenditure'
             c.expenditure = meta.Session.query(model.Expenditure).get(id)
@@ -101,6 +111,8 @@ class SpendController(BaseController):
                                        in c.expenditure.splits))
                 share = shares_by_user.get(user, '')
                 c.values['shares-%d.amount' % ii] = share
+
+            c.values['tags'] = ', '.join([tag.tag for tag in c.expenditure.tags])
 
         return render('/spend/index.mako')
 
@@ -122,6 +134,7 @@ class SpendController(BaseController):
         
         # Set the fields that were submitted
         shares = self.form_result.pop('shares')
+        tags = self.form_result.pop('tags') or set()
         update_sar(e, self.form_result)
 
         users = dict(meta.Session.query(model.User.id, model.User).all())
@@ -133,7 +146,8 @@ class SpendController(BaseController):
             split_dict[user] = amount
             split_text_dict[user] = amount_text
         e.split(split_dict, split_text_dict)
-        
+        e.tag(tags)
+
         meta.Session.commit()
        
         show = ("Expenditure of %s paid for by %s %s." %

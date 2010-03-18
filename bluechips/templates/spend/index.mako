@@ -19,6 +19,10 @@
       <th><label for="description">Description</label></th>
       <td>${h.text('description', c.expenditure.description, size=64)}</td>
     </tr>
+    <tr>
+      <th><label for="tags">Tags</label></th>
+      <td>${h.text('tags', c.values['tags'], size=64)}</td>
+    </tr>
   </table>
 
   <p>Change how an expenditure is split up. Enter a percentage, or something like a percentage, for each user. They don't have to add to 100.</p>

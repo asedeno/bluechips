@@ -2,6 +2,7 @@ from bluechips.model.user import User
 from bluechips.model.split import Split
 from bluechips.model import meta
 from bluechips.model.types import Currency
+from bluechips.model.tag import Tag
 from decimal import Decimal
 from datetime import datetime
 import random
@@ -73,6 +74,14 @@ class Expenditure(object):
         for user, share in amounts_dict.iteritems():
             s = Split(self, user, share, split_text_dict[user])
             meta.Session.add(s)
+
+    def tag(self, tags):
+        map(meta.Session.delete,
+            meta.Session.query(Tag).filter_by(expenditure_id=self.id))
+
+        for tag in tags:
+            t = Tag(self, tag)
+            meta.Session.add(t)
 
     def involves(self, user):
         "Returns True if ``user`` is involved in this expenditure."

@@ -7,6 +7,7 @@ from bluechips.model.expenditure import Expenditure
 from bluechips.model.split import Split
 from bluechips.model.subitem import Subitem
 from bluechips.model.transfer import Transfer
+from bluechips.model.tag import Tag
 
 from bluechips.model import meta
 from bluechips.model import types
@@ -53,6 +54,13 @@ splits = sa.Table('splits', meta.metadata,
                   sa.Column('share', types.DBCurrency, nullable=False)
                   )
 
+tags = sa.Table('tags', meta.metadata,
+                sa.Column('id', sa.types.Integer, primary_key=True),
+                sa.Column('expenditure_id', sa.types.Integer,
+                          sa.ForeignKey('expenditures.id'), nullable=False),
+                sa.Column('tag', sa.Text, nullable=False))
+
+
 subitems = sa.Table('subitems', meta.metadata,
                     sa.Column('id', sa.types.Integer, primary_key=True),
                     sa.Column('expenditure_id', sa.types.Integer,
@@ -88,6 +96,8 @@ orm.mapper(Expenditure, expenditures,
            properties={
         'splits': orm.relation(Split, backref='expenditure',
                                cascade='all, delete'),
+        'tags': orm.relation(Tag, backref='expenditure',
+                             cascade='all, delete'),
         'subitems': orm.relation(Subitem, backref='expenditure',
                                  cascade='all, delete')
 })
@@ -95,6 +105,8 @@ orm.mapper(Expenditure, expenditures,
 orm.mapper(Split, splits, properties={
         'user': orm.relation(User)
 })
+
+orm.mapper(Tag, tags)
 
 orm.mapper(Subitem, subitems, properties={
         'user': orm.relation(User)
@@ -111,6 +123,6 @@ orm.mapper(Transfer, transfers,
                                                   users.c.id))
 })
 
-__all__ = ['users', 'expenditures', 'splits', 'subitems', 'transfers',
-           'User', 'Expenditure', 'Split', 'Subitem', 'Transfer',
+__all__ = ['users', 'expenditures', 'splits', 'tags', 'subitems', 'transfers',
+           'User', 'Expenditure', 'Split', 'Tag', 'Subitem', 'Transfer',
            'meta']
