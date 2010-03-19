@@ -82,6 +82,9 @@ table.list td.share {
     width: 90px;
     text-align: right;
 }
+table.list td.editlink {
+    width: 30px;
+}
 #totals {
     margin-bottom: 10px;
 }

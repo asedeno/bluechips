@@ -30,8 +30,12 @@
       <td>${h.text('description', c.transfer.description, size=64)}</td>
     </tr>
     <tr>
+      <td></td>
       <td colspan="2">
         <input type="submit" value="Submit" />
+        %if c.transfer.id:
+	<input type="button" value="Delete" onClick="window.location.href='${h.url_for(controller='transfer', action='delete', id=c.transfer.id)}'">
+	%endif
       </td>
     </tr>
   </table>

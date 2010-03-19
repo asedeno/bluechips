@@ -45,8 +45,12 @@
       </tr>
     % endfor
     <tr>
+      <td></td>
       <td colspan="2">
         ${h.submit(None, 'Submit', class_="submitbutton")}
+        %if c.expenditure.id:
+	<input type="button" value="Delete" onClick="window.location.href='${h.url_for(controller='spend', action='delete', id=c.expenditure.id)}'">
+	%endif
       </td>
     </tr>
   </table>

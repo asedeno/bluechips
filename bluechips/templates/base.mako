@@ -93,7 +93,6 @@
       <th class="amount">Amount</th>
       <th class="share">My Share</th>
       <th class="editlink"></th>
-      <th class="deletelink"></th>
     </tr>
     % for e in es:
       <%
@@ -109,7 +108,6 @@
         <td class="amount">${e.amount}</td>
         <td class="share">${e.share(request.environ['user'])}</td>
         <td class="editlink">${h.link_to('Edit', h.url_for(controller='spend', action='edit', id=e.id))}</td>
-        <td class="deletelink">${h.link_to('Delete', h.url_for(controller='spend', action='delete', id=e.id))}</td>
       </tr>
     % endfor
   </table>
@@ -124,7 +122,6 @@
       <th class="description">Description</th>
       <th class="amount">Amount</th>
       <th class="editlink"></th>
-      <th class="deletelink"></th>
     </tr>
     % for t in ts:
       <%
@@ -140,7 +137,6 @@
         <td class="description">${t.description}</td>
         <td class="amount">${t.amount}</td>
         <td class="editlink">${h.link_to('Edit', h.url_for(controller='transfer', action='edit', id=t.id))}</td>
-        <td class="deletelink">${h.link_to('Delete', h.url_for(controller='transfer', action='delete', id=t.id))}</td>
       </tr>
     % endfor
   </table>
