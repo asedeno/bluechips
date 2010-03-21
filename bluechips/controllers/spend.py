@@ -63,6 +63,12 @@ def validate_state(value_dict, state, validator):
 ValidateNotAllZero = SimpleFormValidator(validate_state)
 
 
+def prune_tags():
+    for tag in meta.Session.query(model.Tag).all():
+        if not tag.expenditures:
+            meta.Session.delete(tag)
+    meta.Session.commit()
+
 class ExpenditureSchema(Schema):
     "Validate an expenditure."
     allow_extra_fields = False
@@ -163,6 +169,8 @@ class SpendController(BaseController):
                                   'op': op})
         g.handle_notification(involved_users, show, body)
 
+        prune_tags()
+
         return h.redirect_to('/')
 
     def delete(self, id):
@@ -194,5 +202,7 @@ class SpendController(BaseController):
                           extra_vars={'expenditure': e,
                                       'op': 'deleted'})
             g.handle_notification(involved_users, show, body)
+
+            prune_tags()
 
         return h.redirect_to('/')
