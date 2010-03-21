@@ -84,7 +84,7 @@
   % endif
 </%def>
 
-<%def name="listExpenditures(es)">
+<%def name="listExpenditures(es, total=None, share=None)">
   <table class="list">
     <tr>
       <th class="date">Date</th>
@@ -110,6 +110,15 @@
         <td class="editlink">${h.link_to('Edit', h.url_for(controller='spend', action='edit', id=e.id))}</td>
       </tr>
     % endfor
+    % if total is not None and share is not None:
+      <tr class="user-involved">
+        <td class="total" colspan=3></td>
+	<td class="total">${total}</td>
+	<td class="total">${share}</td>
+	<td class="total"></td>
+      </tr>
+
+    % endif
   </table>
 </%def>
 
@@ -141,6 +150,14 @@
     % endfor
   </table>
 </%def>
+
+<%def name="listTags()">
+<%
+x = ',\n'.join([h.link_to(tag.name, h.url_for(controller='history', action='tag', id=tag.id)) for tag in c.tags])
+%>
+${x|n}
+</%def>
+
 
 <%def name="expenditureIcon()">
 &larr;<span class="dollarsign">&rarr;

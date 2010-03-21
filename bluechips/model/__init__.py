@@ -111,7 +111,8 @@ orm.mapper(Split, splits, properties={
         'user': orm.relation(User)
 })
 
-orm.mapper(Tag, tags)
+orm.mapper(Tag, tags, properties={
+        'expenditures': orm.relation(Expenditure, secondary=tag_to_expense_map)})
 
 orm.mapper(Subitem, subitems, properties={
         'user': orm.relation(User)
