@@ -99,10 +99,7 @@ class SpendController(BaseController):
             c.values = {}
             for ii, user_row in enumerate(c.users):
                 user_id, user = user_row
-                val = 0
-                if user.resident:
-                    val = Decimal(1)
-                c.values['shares-%d.amount' % ii] = val
+                c.values['shares-%d.amount' % ii] = 1 if user.resident else ""
 
             c.values['tags'] = u""
         else:
