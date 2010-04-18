@@ -175,6 +175,7 @@ class SpendController(BaseController):
         c.expenditure = meta.Session.query(model.Expenditure).get(id)
         if c.expenditure is None:
             abort(404)
+        c.tags = ', '.join(c.expenditure.tags)
 
         return render('/spend/delete.mako')
 

@@ -22,6 +22,10 @@
       <td>${c.expenditure.description}</td>
     </tr>
     <tr>
+      <th><label for="tags">Tags</label></th>
+      <td>${c.tags}</td>
+    </tr>
+    <tr>
       <td colspan="2">
         ${h.submit('delete', 'Delete', class_="submitbutton")}
         ${h.submit('cancel', 'Cancel', class_="submitbutton")}
