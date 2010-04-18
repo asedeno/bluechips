@@ -87,6 +87,10 @@
           <th><label for="description">Description</label></th>
           <td>${h.text('description', h.grab(c.expenditure, 'description'))}</td>
         </tr>
+        <tr>
+          <th><label for="tags">Tags</label></th>
+          <td>${h.text('tags', h.grab(c, 'tags'))}</td>
+        </tr>
       </table>
 
       <p>Change how an expenditure is split up.</p>
