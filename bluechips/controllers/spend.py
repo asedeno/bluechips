@@ -101,7 +101,7 @@ class SpendController(BaseController):
                 user_id, user = user_row
                 c.values['shares-%d.amount' % ii] = 1 if user.resident else ""
 
-            c.values['tags'] = u""
+            c.tags = u""
         else:
             c.title = 'Edit an Expenditure'
             c.expenditure = meta.Session.query(model.Expenditure).get(id)
@@ -115,7 +115,7 @@ class SpendController(BaseController):
                 share = shares_by_user.get(user, '')
                 c.values['shares-%d.amount' % ii] = share
 
-            c.values['tags'] = ', '.join(c.expenditure.tags)
+            c.tags = ', '.join(c.expenditure.tags)
 
         return render('/spend/index.mako')
 

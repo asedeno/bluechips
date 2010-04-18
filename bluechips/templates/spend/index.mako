@@ -21,7 +21,7 @@
     </tr>
     <tr>
       <th><label for="tags">Tags</label></th>
-      <td>${h.text('tags', c.values['tags'], size=64)}</td>
+      <td>${h.text('tags', c.tags, size=64)}</td>
     </tr>
   </table>
 
