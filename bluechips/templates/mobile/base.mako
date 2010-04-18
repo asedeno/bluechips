@@ -99,15 +99,11 @@
         % for ii, user_row in enumerate(c.users):
           <%
             user_id, user = user_row
-            if user.resident:
-              percent = 1
-            else:
-              percent = 0
           %>
           <tr>
             <th><label for="shares-${ii}amount">${user.name}</label></th>
             <td>
-              ${h.text('shares-%d.amount' % ii, percent)}
+              ${h.text('shares-%d.amount' % ii, 1 if user.resident else None)}
               ${h.hidden('shares-%d.user_id' % ii, user.id)}
             </td>
           </tr>
